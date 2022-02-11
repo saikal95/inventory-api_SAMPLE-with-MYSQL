@@ -7,15 +7,13 @@ let categoryAr = [];
 router.get('/', async (req, res, next) => {
   try {
     let query = 'SELECT * FROM category';
-
     let [category] = await db.getConnection().execute(query);
 
-    [category].forEach(function (item){
+    category.forEach(item =>{
       categoryAr.push({id: item.id,name: item.name })
     })
+    return res.send(categoryAr)
 
-
-    return res.send(category);
   } catch (e) {
     next(e);
   }

@@ -1,19 +1,18 @@
 const express = require('express');
 const db = require('../mySqlDb');
 const router = express.Router();
-
+let categoryAr = [];
 
 router.get('/', async (req, res, next) => {
   try {
     let query = 'SELECT * FROM subject';
+    let [subject] = await db.getConnection().execute(query);
 
-    let subject = await db.getConnection().execute(query);
+    subject.forEach(item =>{
+      categoryAr.push({id: item.id,name: item.name })
+    })
 
-    // if ( !subject.description || !subject.name) {
-    //   return res.send('No description and name of the subject can be found');
-    // }
-    // SHORTEN THE REQUEST
-    return res.send(subject);
+    return res.send(categoryAr)
 
   } catch (e) {
     next(e);
@@ -41,19 +40,15 @@ router.post('/', async (req, res, next) => {
 
     const item = {
       name: req.body.name,
-      category_id: req.body.category_id,
-      location_id: req.body.location_id,
       description: req.body.description,
     };
 
     // скрывать буффер
 
-    let query = 'INSERT INTO subject (name,category_id,location_id, description) VALUES (?,?,?,?)';
+    let query = 'INSERT INTO subject (name, description) VALUES (?,?)';
 
     const [results] = await db.getConnection().execute(query, [
       item.name,
-      item.category_id,
-      item.location_id,
       item.description,
     ]);
 

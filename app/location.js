@@ -1,17 +1,22 @@
 const express = require('express');
 const db = require('../mySqlDb');
 const router = express.Router();
+let categoryAr = [];
 
 router.get('/', async (req, res, next) => {
   try {
     let query = 'SELECT * FROM location';
-
     let [location] = await db.getConnection().execute(query);
 
-    return res.send(location);
+    location.forEach(item =>{
+      categoryAr.push({id: item.id,name: item.name })
+    })
+    return res.send(categoryAr)
+
   } catch (e) {
     next(e);
   }
+
 });
 
 router.get('/:id', async (req, res, next) => {
