@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../mySqlDb');
 const router = express.Router();
 
+
 router.get('/', async (req, res, next) => {
   try {
     let query = 'SELECT * FROM subject';
@@ -45,14 +46,14 @@ router.post('/', async (req, res, next) => {
       description: req.body.description,
     };
 
-    // как правильно вписывать внешние ключи чтобы не было null
     // скрывать буффер
 
-
-    let query = 'INSERT INTO subject (name, description) VALUES (?,?,?,?)';
+    let query = 'INSERT INTO subject (name,category_id,location_id, description) VALUES (?,?,?,?)';
 
     const [results] = await db.getConnection().execute(query, [
       item.name,
+      item.category_id,
+      item.location_id,
       item.description,
     ]);
 
@@ -67,22 +68,12 @@ router.post('/', async (req, res, next) => {
 
 router.delete('/:id', async (req, res, next) => {
   try {
-    const [subject] = await db.getConnection().execute('DELETE  FROM subject WHERE id = ?', [req.params.id]);
-    const item = subject[0];
-
-
-    if(!item){
-      return res.send('Object can not be found');
-      // почему проверка не срабатывает
-    }
-
+    await db.getConnection().execute('DELETE  FROM subject WHERE id = ?', [req.params.id]);
 
     return res.send('Object is deleted');
 
-
-
   } catch (e) {
-    next(e);
+      return res.send(`Object can not be found, ${e}`);
   }
 
 })

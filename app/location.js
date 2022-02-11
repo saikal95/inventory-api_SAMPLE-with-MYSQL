@@ -61,24 +61,11 @@ router.post('/', async (req, res, next) => {
 
 router.delete('/:id', async (req, res, next) => {
   try {
-    const [location] = await db.getConnection().execute('DELETE FROM location WHERE id = ?', [req.params.id]);
-    const item = location[0];
-
-
-
-
-    if(!item){
-      return res.send('Object can not be found');
-      // почему проверка не срабатывает надо дать возможность удалять сначала отсюда
-    }
-
-
+   await db.getConnection().execute('DELETE FROM location WHERE id = ?', [req.params.id]);
     return res.send('Object is deleted');
 
-
-
   } catch (e) {
-    next(e);
+      return res.send(`Object can not be found, ${e}`);
   }
 
 })
