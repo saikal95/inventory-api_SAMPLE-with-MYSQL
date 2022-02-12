@@ -4,6 +4,8 @@ const router = express.Router();
 
 let categoryAr = [];
 
+
+
 router.get('/', async (req, res, next) => {
   try {
     let query = 'SELECT * FROM category';
@@ -37,8 +39,8 @@ router.get('/:id', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    if (!req.body.name) {
-      return res.status(400).send({message: 'Body is required'});
+    if (!req.body.name || req.body.description) {
+      return res.status(400).send({message: 'Body and name are required'});
     }
 
     const item = {
@@ -72,33 +74,7 @@ router.post('/', async (req, res, next) => {
     } catch(e) {
         return res.send(`Object can not be found, ${e}`);
       }
-
-
   })
-
-
-
-router.put('/:id', async (req, res, next) => {
-  try {
-
-    const [category] = await db.getConnection().execute('UPDATE category SET { name: category[0].name, description: category[0].description } WHERE id = ?', [req.params.id]);
-    const item = category[0];
-
-
-    if(!item){
-      return res.send('Object can not be found');
-      // почему проверка не срабатывает
-    }
-
-    return res.send(item);
-
-
-  } catch (e) {
-    next(e);
-  }
-
-})
-
 
 
 

@@ -37,7 +37,7 @@ router.get('/:id', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    if (!req.body.name) {
+    if (!req.body.name || !req.body.description) {
       return res.status(400).send({message: 'Body is required'});
     }
 

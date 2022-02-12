@@ -2,3 +2,5 @@ node_modules
 .idea
 public/uploads/*
 !public/uploads/.gitkeep
+!public/uploads/download (3).jpeg
+!public/uploads/geforce_rtx_2.jpg

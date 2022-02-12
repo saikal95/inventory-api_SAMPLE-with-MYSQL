@@ -1,11 +1,31 @@
 const express = require('express');
 const db = require('../mySqlDb');
 const router = express.Router();
+const multer = require('multer');
+const path = require("path");
+const config = require('../config');
 let categoryAr = [];
 
-router.get('/', async (req, res, next) => {
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, config.uploadPath);
+  },
+  filename: (req, file, cb) => {
+    cb(null,  path.extname(file.originalname))
+  }
+});
+
+const upload = multer({storage});
+
+router.get('/',   async (req, res, next) => {
   try {
     let query = 'SELECT * FROM subject';
+
+    if (req.query.orderBy === 'date' && req.query.direction === 'desc') {
+      query += ' ORDER BY id DESC';
+    }
+
     let [subject] = await db.getConnection().execute(query);
 
     subject.forEach(item =>{
@@ -35,21 +55,29 @@ router.get('/:id', async (req, res, next) => {
 
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/',upload.single('image'), async (req, res, next) => {
   try {
 
     const item = {
       name: req.body.name,
+      category_id: req.body.category_id,
+      location_id: req.body.location_id,
       description: req.body.description,
+      image:null,
     };
 
-    // скрывать буффер
+    if (req.file) {
+      item.image = req.file.filename;
+    }
 
-    let query = 'INSERT INTO subject (name, description) VALUES (?,?)';
+    let query = 'INSERT INTO subject (name, category_id,location_id,description,image) VALUES (?,?,?,?,?)';
 
     const [results] = await db.getConnection().execute(query, [
       item.name,
+      item.category_id,
+      item.location_id,
       item.description,
+      item.image,
     ]);
 
     const id = results.insertId;
